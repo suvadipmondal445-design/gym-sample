@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOUNDRY 84 — Strength Gym</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --steel-black: #0d0e10;
+    --charcoal: #17181a;
+    --charcoal-2: #1f2124;
+    --ember: #ff4d1c;
+    --ember-soft: #ff7a45;
+    --steel-gray: #8a8f98;
+    --steel-gray-dim: #55585e;
+    --bone: #f2f0ec;
+    --line: #2c2e32;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--steel-black);
+    color:var(--bone);
+    font-family:'Archivo', sans-serif;
+    overflow-x:hidden;
+  }
+  h1,h2,h3, .display{
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    text-transform:uppercase;
+    letter-spacing:0.01em;
+    line-height:0.92;
+  }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 32px; }
+  ::selection{ background:var(--ember); color:var(--steel-black); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--ember-soft);
+    outline-offset:3px;
+  }
+
+  /* ---------- NAV ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(13,14,16,0.86);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    max-width:1180px; margin:0 auto; padding:18px 32px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo{
+    font-family:'Anton', sans-serif;
+    font-size:22px;
+    letter-spacing:0.03em;
+  }
+  .logo span{ color:var(--ember); }
+  .nav-links{ display:flex; gap:36px; }
+  .nav-links a{
+    font-size:13px; text-transform:uppercase; letter-spacing:0.12em;
+    color:var(--steel-gray); font-weight:600;
+    transition:color 0.2s ease;
+  }
+  .nav-links a:hover{ color:var(--bone); }
+  .nav-cta{
+    font-size:12px; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;
+    background:var(--ember); color:var(--steel-black);
+    padding:10px 20px; border-radius:2px;
+    transition:background 0.2s ease;
+  }
+  .nav-cta:hover{ background:var(--ember-soft); }
+  .menu-btn{ display:none; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex; align-items:center;
+    padding-top:80px;
+    background:
+      radial-gradient(ellipse 900px 500px at 78% 15%, rgba(255,77,28,0.16), transparent 60%),
+      linear-gradient(180deg, var(--steel-black) 0%, #0a0b0c 100%);
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:0.18;
+    mask-image:linear-gradient(180deg, transparent, black 30%, black 70%, transparent);
+  }
+  .hero-inner{
+    position:relative; z-index:2;
+    max-width:1180px; margin:0 auto; padding:0 32px;
+    width:100%;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--ember-soft);
+    margin-bottom:28px;
+  }
+  .eyebrow::before{
+    content:""; width:8px; height:8px; background:var(--ember);
+    border-radius:50%;
+    box-shadow:0 0 12px 2px var(--ember);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+  .hero h1{
+    font-size:clamp(52px, 9vw, 128px);
+    color:var(--bone);
+  }
+  .hero h1 .fire{
+    color:transparent;
+    -webkit-text-stroke:1.5px var(--ember-soft);
+  }
+  .hero-sub{
+    max-width:520px;
+    font-size:18px; line-height:1.6; color:var(--steel-gray);
+    margin-top:28px;
+  }
+  .hero-actions{
+    display:flex; gap:16px; margin-top:44px; flex-wrap:wrap;
+  }
+  .btn-primary{
+    background:var(--ember); color:var(--steel-black);
+    padding:16px 30px; font-weight:700; font-size:14px;
+    text-transform:uppercase; letter-spacing:0.08em;
+    border-radius:2px;
+    transition:transform 0.2s ease, background 0.2s ease;
+    display:inline-block;
+  }
+  .btn-primary:hover{ background:var(--ember-soft); transform:translateY(-2px); }
+  .btn-ghost{
+    border:1px solid var(--line); color:var(--bone);
+    padding:16px 30px; font-weight:700; font-size:14px;
+    text-transform:uppercase; letter-spacing:0.08em;
+    border-radius:2px;
+    transition:border-color 0.2s ease, background 0.2s ease;
+  }
+  .btn-ghost:hover{ border-color:var(--ember-soft); background:rgba(255,77,28,0.06); }
+
+  .hero-stats{
+    display:flex; gap:48px; margin-top:80px; flex-wrap:wrap;
+  }
+  .hero-stat .num{
+    font-family:'JetBrains Mono', monospace; font-weight:700;
+    font-size:30px; color:var(--ember-soft);
+  }
+  .hero-stat .lbl{
+    font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--steel-gray-dim);
+    margin-top:4px;
+  }
+
+  /* drip divider - signature element */
+  .drip{
+    display:block; width:100%; height:64px;
+    fill:var(--charcoal);
+  }
+
+  /* ---------- SECTION SHARED ---------- */
+  section{ position:relative; }
+  .section-pad{ padding:110px 0; }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:24px; margin-bottom:64px; flex-wrap:wrap;
+  }
+  .section-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--ember-soft); margin-bottom:14px; display:block;
+  }
+  .section-head h2{ font-size:clamp(34px, 5vw, 56px); }
+  .section-head p{ color:var(--steel-gray); max-width:360px; font-size:15px; line-height:1.6; }
+
+  /* ---------- PHILOSOPHY ---------- */
+  .philosophy{ background:var(--charcoal); }
+  .phil-grid{
+    display:grid; grid-template-columns:1.1fr 1fr; gap:80px; align-items:center;
+  }
+  .phil-grid p{ color:var(--steel-gray); font-size:16px; line-height:1.8; margin-bottom:20px; }
+  .phil-quote{
+    font-family:'Anton', sans-serif;
+    font-size:clamp(26px, 3vw, 38px);
+    color:var(--bone); line-height:1.15; text-transform:none;
+    border-left:3px solid var(--ember);
+    padding-left:28px;
+  }
+  .phil-quote span{ color:var(--ember-soft); }
+
+  /* heat gauge signature */
+  .gauge-box{
+    background:var(--steel-black); border:1px solid var(--line);
+    padding:36px; border-radius:4px;
+  }
+  .gauge-title{ font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--steel-gray-dim); margin-bottom:22px; }
+  .gauge-row{ margin-bottom:20px; }
+  .gauge-row:last-child{ margin-bottom:0; }
+  .gauge-label{
+    display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .gauge-label b{ color:var(--bone); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;}
+  .gauge-label .temp{ color:var(--ember-soft); }
+  .gauge-track{ height:8px; background:var(--charcoal-2); border-radius:4px; overflow:hidden; }
+  .gauge-fill{
+    height:100%; border-radius:4px;
+    background:linear-gradient(90deg, var(--ember-soft), var(--ember));
+    width:0%;
+    transition:width 1.4s cubic-bezier(.2,.8,.2,1);
+  }
+  .gauge-track.visible .gauge-fill{ }
+
+  /* ---------- PROGRAMS ---------- */
+  .programs{ background:var(--steel-black); }
+  .program-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line);
+  }
+  .program-card{
+    background:var(--steel-black);
+    padding:36px 28px;
+    position:relative;
+    min-height:340px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    transition:background 0.3s ease;
+  }
+  .program-card:hover{ background:var(--charcoal); }
+  .program-card .pnum{
+    position:absolute; top:28px; right:28px;
+    font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--steel-gray-dim);
+  }
+  .program-card h3{
+    font-size:26px; margin-bottom:12px; color:var(--bone);
+  }
+  .program-card p{ color:var(--steel-gray); font-size:14px; line-height:1.6; margin-bottom:16px; }
+  .program-card .heat{
+    font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase;
+    letter-spacing:0.1em; color:var(--ember-soft);
+    display:flex; align-items:center; gap:6px;
+  }
+  .heat::before{ content:"◆"; font-size:9px; }
+
+  /* ---------- TRAINERS ---------- */
+  .trainers{ background:var(--charcoal); }
+  .trainer-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:28px;
+  }
+  .trainer-card{
+    background:var(--steel-black); border:1px solid var(--line); border-radius:4px;
+    overflow:hidden;
+  }
+  .trainer-photo{
+    height:280px;
+    background:linear-gradient(160deg, #2a2c30, #131417);
+    position:relative;
+    display:flex; align-items:flex-end; padding:20px;
+    overflow:hidden;
+  }
+  .trainer-photo img{
+    position:absolute; inset:0;
+    width:100%; height:100%; object-fit:cover;
+    filter:grayscale(15%) contrast(1.05);
+  }
+  .trainer-photo::after{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(circle at 70% 20%, rgba(255,77,28,0.22), transparent 55%);
+  }
+  .trainer-mono{
+    position:relative; z-index:1;
+    font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--steel-gray-dim);
+    letter-spacing:0.08em;
+  }
+  .trainer-info{ padding:24px; }
+  .trainer-info h3{ font-size:20px; margin-bottom:4px; }
+  .trainer-info .role{ color:var(--ember-soft); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px; display:block; }
+  .trainer-info p{ color:var(--steel-gray); font-size:14px; line-height:1.6; }
+
+  /* ---------- SCHEDULE ---------- */
+  .schedule{ background:var(--steel-black); }
+  table{ width:100%; border-collapse:collapse; }
+  th, td{
+    text-align:left; padding:18px 20px; border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  th{
+    font-family:'JetBrains Mono', monospace; font-size:11px; text-transform:uppercase;
+    letter-spacing:0.1em; color:var(--steel-gray-dim); font-weight:500;
+  }
+  td.time{ font-family:'JetBrains Mono', monospace; color:var(--ember-soft); white-space:nowrap; }
+  td.cname{ color:var(--bone); font-weight:600; }
+  td.coach{ color:var(--steel-gray); }
+  tr:hover td{ background:var(--charcoal); }
+
+  /* ---------- MEMBERSHIP ---------- */
+  .membership{ background:var(--charcoal); }
+  .plan-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+  .plan-card{
+    background:var(--steel-black); border:1px solid var(--line); border-radius:4px;
+    padding:36px 30px; display:flex; flex-direction:column;
+    transition:border-color 0.25s ease, transform 0.25s ease;
+  }
+  .plan-card:hover{ transform:translateY(-6px); border-color:var(--ember-soft); }
+  .plan-card.featured{ border-color:var(--ember); position:relative; }
+  .plan-badge{
+    position:absolute; top:-13px; left:30px;
+    background:var(--ember); color:var(--steel-black);
+    font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+    padding:5px 12px; border-radius:2px;
+  }
+  .plan-name{ font-size:13px; text-transform:uppercase; letter-spacing:0.12em; color:var(--steel-gray); margin-bottom:18px; }
+  .plan-price{ font-family:'Anton', sans-serif; font-size:48px; color:var(--bone); margin-bottom:4px; }
+  .plan-price span{ font-family:'Archivo', sans-serif; font-size:14px; color:var(--steel-gray-dim); text-transform:none; }
+  .plan-desc{ color:var(--steel-gray); font-size:13px; margin-bottom:26px; }
+  .plan-list{ list-style:none; margin-bottom:32px; flex-grow:1; }
+  .plan-list li{
+    font-size:14px; color:var(--bone); padding:10px 0; border-top:1px solid var(--line);
+    display:flex; gap:10px; align-items:center;
+  }
+  .plan-list li:first-child{ border-top:none; }
+  .plan-list li::before{ content:"—"; color:var(--ember-soft); }
+  .plan-cta{
+    text-align:center; padding:14px; border:1px solid var(--line); border-radius:2px;
+    font-size:13px; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;
+    transition:all 0.2s ease;
+  }
+  .plan-card.featured .plan-cta{ background:var(--ember); color:var(--steel-black); border-color:var(--ember); }
+  .plan-cta:hover{ background:var(--ember-soft); border-color:var(--ember-soft); color:var(--steel-black); }
+
+  /* ---------- CTA / FOOTER ---------- */
+  .cta-section{
+    background:var(--steel-black);
+    padding:130px 0;
+    text-align:center;
+    position:relative;
+    background:
+      radial-gradient(ellipse 700px 400px at 50% 100%, rgba(255,77,28,0.14), transparent 70%),
+      var(--steel-black);
+  }
+  .cta-section h2{ font-size:clamp(36px,6vw,72px); margin-bottom:24px; }
+  .cta-section p{ color:var(--steel-gray); max-width:480px; margin:0 auto 40px; font-size:16px; }
+
+  footer{
+    background:var(--charcoal); border-top:1px solid var(--line);
+    padding:60px 0 30px;
+  }
+  .footer-grid{
+    display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px;
+    margin-bottom:50px;
+  }
+  .footer-grid h4{
+    font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--steel-gray-dim);
+    margin-bottom:18px;
+  }
+  .footer-grid a, .footer-grid p{
+    display:block; color:var(--steel-gray); font-size:14px; margin-bottom:10px; line-height:1.6;
+    transition:color 0.2s ease;
+  }
+  .footer-grid a:hover{ color:var(--ember-soft); }
+  .footer-bottom{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-top:24px; border-top:1px solid var(--line);
+    font-size:12px; color:var(--steel-gray-dim); flex-wrap:wrap; gap:12px;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:900px){
+    .nav-links{ display:none; }
+    .phil-grid{ grid-template-columns:1fr; gap:48px; }
+    .program-grid{ grid-template-columns:repeat(2,1fr); }
+    .trainer-grid{ grid-template-columns:1fr; }
+    .plan-grid{ grid-template-columns:1fr; }
+    .footer-grid{ grid-template-columns:1fr 1fr; }
+    table{ font-size:12px; }
+    th:nth-child(3), td:nth-child(3){ display:none; }
+  }
+  @media (max-width:560px){
+    .footer-grid{ grid-template-columns:1fr; }
+    .hero-stats{ gap:30px; }
+  }
+
+  /* ---------- BOOKING MODAL ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(10,11,12,0.78);
+    backdrop-filter:blur(4px);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+    opacity:0; pointer-events:none;
+    transition:opacity 0.25s ease;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .modal-box{
+    background:var(--charcoal); border:1px solid var(--line); border-radius:6px;
+    width:100%; max-width:440px;
+    padding:36px;
+    position:relative;
+    transform:translateY(16px);
+    transition:transform 0.25s ease;
+  }
+  .modal-overlay.open .modal-box{ transform:translateY(0); }
+  .modal-close{
+    position:absolute; top:18px; right:18px;
+    background:none; border:none; color:var(--steel-gray);
+    font-size:22px; cursor:pointer; line-height:1;
+    transition:color 0.2s ease;
+  }
+  .modal-close:hover{ color:var(--ember-soft); }
+  .modal-box .section-tag{ margin-bottom:10px; }
+  .modal-box h3{ font-size:28px; margin-bottom:8px; }
+  .modal-box .modal-sub{ color:var(--steel-gray); font-size:14px; margin-bottom:26px; }
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block; font-size:12px; text-transform:uppercase; letter-spacing:0.08em;
+    color:var(--steel-gray-dim); margin-bottom:8px;
+  }
+  .field input, .field select{
+    width:100%; background:var(--steel-black); border:1px solid var(--line);
+    color:var(--bone); padding:12px 14px; border-radius:3px; font-size:14px;
+    font-family:'Archivo', sans-serif;
+  }
+  .field input:focus, .field select:focus{
+    outline:none; border-color:var(--ember-soft);
+  }
+  .modal-submit{
+    width:100%; background:var(--ember); color:var(--steel-black);
+    border:none; padding:15px; font-weight:700; font-size:14px;
+    text-transform:uppercase; letter-spacing:0.08em; border-radius:3px;
+    cursor:pointer; margin-top:6px;
+    transition:background 0.2s ease;
+  }
+  .modal-submit:hover{ background:var(--ember-soft); }
+  .modal-success{ display:none; text-align:center; padding:20px 0; }
+  .modal-success.show{ display:block; }
+  .modal-success .check{
+    width:48px; height:48px; border-radius:50%; background:var(--ember);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 18px;
+    font-size:22px; color:var(--steel-black); font-weight:700;
+  }
+  .modal-success h3{ font-size:22px; margin-bottom:10px; }
+  .modal-success p{ color:var(--steel-gray); font-size:14px; }
+
+  /* ---------- GYM GALLERY ---------- */
+  .gallery{ background:var(--steel-black); }
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    grid-auto-rows:180px;
+    gap:12px;
+  }
+  .gallery-grid img{
+    width:100%; height:100%; object-fit:cover; border-radius:4px;
+    filter:grayscale(10%) contrast(1.05);
+    transition:transform 0.35s ease, filter 0.35s ease;
+  }
+  .gallery-item{ overflow:hidden; border-radius:4px; }
+  .gallery-item:hover img{ transform:scale(1.06); filter:grayscale(0%) contrast(1.05); }
+  .gallery-item.tall{ grid-row:span 2; }
+  .gallery-item.wide{ grid-column:span 2; }
+
+  /* ---------- LOCATION / MAP ---------- */
+  .location{ background:var(--charcoal); }
+  .location-grid{
+    display:grid; grid-template-columns:1fr 1.2fr; gap:48px; align-items:stretch;
+  }
+  .location-info{ display:flex; flex-direction:column; justify-content:center; }
+  .location-info p{ color:var(--steel-gray); font-size:15px; line-height:1.8; margin-bottom:24px; }
+  .location-detail{ display:flex; gap:14px; margin-bottom:18px; }
+  .location-detail .dot{
+    width:8px; height:8px; border-radius:50%; background:var(--ember);
+    margin-top:7px; flex-shrink:0;
+  }
+  .location-detail div b{ display:block; color:var(--bone); font-size:14px; margin-bottom:2px; }
+  .location-detail div span{ color:var(--steel-gray); font-size:14px; }
+  .map-frame{
+    border:1px solid var(--line); border-radius:4px; overflow:hidden;
+    min-height:360px;
+  }
+  .map-frame iframe{ width:100%; height:100%; min-height:360px; border:0; display:block; }
+
+  @media (max-width:900px){
+    .gallery-grid{ grid-template-columns:repeat(2,1fr); }
+    .gallery-item.wide{ grid-column:span 2; }
+    .location-grid{ grid-template-columns:1fr; }
+  }
+</style>
+
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo">FOUNDRY<span>84</span></div>
+    <div class="nav-links">
+      <a href="#programs">Programs</a>
+      <a href="#trainers">Coaches</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#membership">Membership</a>
+      <a href="#location">Visit</a>
+    </div>
+    <button class="nav-cta" onclick="openModal('Full Floor')">Join The Foundry</button>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow mono">EST. 1984 · UNIT 12, RIVERSIDE IRONWORKS</div>
+    <h1>YOU DON'T<br>RISE. YOU GET<br><span class="fire">FORGED.</span></h1>
+    <p class="hero-sub">A strength gym built inside a working ironworks. No mirrors on the lifting floor, no music videos on the walls — just iron, chalk, and people who show up at 5:30am because that's when the metal is honest.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="openModal('Free Trial Session')">Book A Free Session</button>
+      <a href="#programs" class="btn-ghost">See The Programs</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">1,150°F</div><div class="lbl">Our Namesake Forge</div></div>
+      <div class="hero-stat"><div class="num">420+</div><div class="lbl">Members On The Floor</div></div>
+      <div class="hero-stat"><div class="num">05:30</div><div class="lbl">First Barbell Loaded</div></div>
+    </div>
+  </div>
+</section>
+
+<svg class="drip" viewBox="0 0 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0,0 L1200,0 L1200,20 C1150,20 1130,55 1080,55 C1030,55 1015,15 970,15 C920,15 905,48 855,48 C800,48 790,10 740,10 C690,10 675,40 625,40 C575,40 565,5 515,5 C465,5 450,35 400,35 C350,35 340,0 290,0 C240,0 225,28 175,28 C125,28 110,3 60,3 C30,3 15,15 0,15 Z"></path>
+</svg>
+
+<section class="philosophy section-pad">
+  <div class="wrap">
+    <div class="phil-grid">
+      <div>
+        <span class="section-tag">The Philosophy</span>
+        <p class="phil-quote">Every bar you load is a <span>casting</span>. It takes heat, pressure, and time before it holds any shape at all.</p>
+        <p style="margin-top:32px;">Foundry 84 opened in a decommissioned casting hall on the river, and we kept the bones of the place on purpose: exposed ductwork, concrete you can feel through your shoes, a floor that has held real weight since before any of us were born.</p>
+        <p>We coach three things — bar path, breathing, and patience. Everything on our schedule, from the strength blocks to the conditioning circuits, is built to raise your working temperature without burning you out.</p>
+      </div>
+      <div class="gauge-box">
+        <div class="gauge-title mono">Session Intensity Guide</div>
+        <div class="gauge-row">
+          <div class="gauge-label"><b>Foundation Strength</b><span class="temp">Low Heat</span></div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:32%"></div></div>
+        </div>
+        <div class="gauge-row">
+          <div class="gauge-label"><b>Powerlifting Block</b><span class="temp">Med Heat</span></div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:64%"></div></div>
+        </div>
+        <div class="gauge-row">
+          <div class="gauge-label"><b>Metal Conditioning</b><span class="temp">High Heat</span></div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:88%"></div></div>
+        </div>
+        <div class="gauge-row">
+          <div class="gauge-label"><b>Pour Day (Max Effort)</b><span class="temp">Full Melt</span></div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:100%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="programs section-pad" id="programs">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">Programs</span>
+        <h2>Pick Your Alloy</h2>
+      </div>
+      <p>Four programs, one floor. Mix and move between them as your goals change — most members run two at once.</p>
+    </div>
+  </div>
+  <div class="wrap" style="padding:0;">
+    <div class="program-grid">
+      <div class="program-card">
+        <span class="pnum mono">01</span>
+        <h3>Foundation</h3>
+        <p>Barbell fundamentals, mobility, and coached technique for anyone new to lifting heavy.</p>
+        <span class="heat">Low Heat · 3x/week</span>
+      </div>
+      <div class="program-card">
+        <span class="pnum mono">02</span>
+        <h3>Powerlifting</h3>
+        <p>Squat, bench, and deadlift periodization for members chasing numbers and meet totals.</p>
+        <span class="heat">Med Heat · 4x/week</span>
+      </div>
+      <div class="program-card">
+        <span class="pnum mono">03</span>
+        <h3>Metal Conditioning</h3>
+        <p>Sled pushes, kettlebells, and engine work on the yard behind the old loading dock.</p>
+        <span class="heat">High Heat · 3x/week</span>
+      </div>
+      <div class="program-card">
+        <span class="pnum mono">04</span>
+        <h3>Open Floor</h3>
+        <p>Full access to the platforms and racks, program your own session, coaches on the floor if you need a spot.</p>
+        <span class="heat">Full Melt · 7x/week</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="trainers section-pad" id="trainers">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">The Coaches</span>
+        <h2>Who's On The Floor</h2>
+      </div>
+      <p>Every coach at Foundry 84 competes or has competed. They coach what they still do.</p>
+    </div>
+    <div class="trainer-grid">
+      <div class="trainer-card">
+        <div class="trainer-photo">
+          <img src="images/coach-marcus.jpg" alt="Marcus Oduya, Head Coach of Powerlifting at Foundry 84" onerror="this.style.display='none'">
+        </div>
+        <div class="trainer-info">
+          <h3>Marcus Oduya</h3>
+          <span class="role">Head Coach, Powerlifting</span>
+          <p>Former national-level powerlifter, twelve years coaching raw squat and deadlift technique.</p>
+        </div>
+      </div>
+      <div class="trainer-card">
+        <div class="trainer-photo">
+          <img src="images/coach-priya.jpg" alt="Priya Reyes, Foundation and Mobility coach at Foundry 84" onerror="this.style.display='none'">
+        </div>
+        <div class="trainer-info">
+          <h3>Priya Reyes</h3>
+          <span class="role">Foundation & Mobility</span>
+          <p>Physiotherapist turned strength coach, specializes in getting new lifters loaded safely and fast.</p>
+        </div>
+      </div>
+      <div class="trainer-card">
+        <div class="trainer-photo">
+          <img src="images/coach-daniel.jpg" alt="Daniel Voss, Metal Conditioning coach at Foundry 84" onerror="this.style.display='none'">
+        </div>
+        <div class="trainer-info">
+          <h3>Daniel Voss</h3>
+          <span class="role">Metal Conditioning</span>
+          <p>Ex strongman competitor who runs the yard sessions — sleds, kegs, and engine circuits.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="gallery section-pad" id="gallery">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">Inside The Foundry</span>
+        <h2>The Floor Itself</h2>
+      </div>
+      <p>No stock photos — this is the actual floor, racks, and yard.</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item wide tall">
+        <img src="images/gym-floor-wide.jpg" alt="Main lifting floor at Foundry 84" onerror="this.parentElement.style.display='none'">
+      </div>
+      <div class="gallery-item">
+        <img src="images/gym-racks.jpg" alt="Squat racks at Foundry 84" onerror="this.parentElement.style.display='none'">
+      </div>
+      <div class="gallery-item">
+        <img src="images/gym-plates.jpg" alt="Weight plates and chalk station" onerror="this.parentElement.style.display='none'">
+      </div>
+      <div class="gallery-item">
+        <img src="images/gym-yard.jpg" alt="Outdoor conditioning yard" onerror="this.parentElement.style.display='none'">
+      </div>
+      <div class="gallery-item">
+        <img src="images/gym-entrance.jpg" alt="Foundry 84 entrance sign" onerror="this.parentElement.style.display='none'">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="schedule section-pad" id="schedule">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">Weekly Schedule</span>
+        <h2>Monday On The Floor</h2>
+      </div>
+      <p>A sample Monday. Full weekly timetable is posted at the front desk and in the member app.</p>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Time</th><th>Class</th><th>Coach</th><th>Program</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="time">05:30 – 06:30</td><td class="cname">Early Iron</td><td class="coach">Marcus Oduya</td><td>Powerlifting</td></tr>
+        <tr><td class="time">07:00 – 08:00</td><td class="cname">Foundation Barbell</td><td class="coach">Priya Reyes</td><td>Foundation</td></tr>
+        <tr><td class="time">12:00 – 13:00</td><td class="cname">Lunch Yard</td><td class="coach">Daniel Voss</td><td>Metal Conditioning</td></tr>
+        <tr><td class="time">17:30 – 18:30</td><td class="cname">Squat Block</td><td class="coach">Marcus Oduya</td><td>Powerlifting</td></tr>
+        <tr><td class="time">18:45 – 19:45</td><td class="cname">Engine Hour</td><td class="coach">Daniel Voss</td><td>Metal Conditioning</td></tr>
+        <tr><td class="time">20:00 – 22:00</td><td class="cname">Open Floor</td><td class="coach">Coach on duty</td><td>Open Floor</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="membership section-pad" id="membership">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">Membership</span>
+        <h2>Join The Floor</h2>
+      </div>
+      <p>No joining fee, no contracts. Cancel or pause any month from the member app.</p>
+    </div>
+    <div class="plan-grid">
+      <div class="plan-card">
+        <div class="plan-name mono">Foundation</div>
+        <div class="plan-price">$59<span>/mo</span></div>
+        <p class="plan-desc">For lifters starting out on the Foundation program.</p>
+        <ul class="plan-list">
+          <li>Foundation classes, 3x/week</li>
+          <li>Open floor, off-peak hours</li>
+          <li>Technique check-ins monthly</li>
+        </ul>
+        <button class="plan-cta" onclick="openModal('Foundation')">Start Foundation</button>
+      </div>
+      <div class="plan-card featured">
+        <span class="plan-badge">Most Loaded</span>
+        <div class="plan-name mono">Full Floor</div>
+        <div class="plan-price">$99<span>/mo</span></div>
+        <p class="plan-desc">Unlimited access across every program on the schedule.</p>
+        <ul class="plan-list">
+          <li>All programs, unlimited classes</li>
+          <li>24/7 open floor access</li>
+          <li>Monthly 1:1 with a head coach</li>
+          <li>Guest pass, 2x/month</li>
+        </ul>
+        <button class="plan-cta" onclick="openModal('Full Floor')">Go Full Floor</button>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name mono">Competitor</div>
+        <div class="plan-price">$149<span>/mo</span></div>
+        <p class="plan-desc">For lifters training toward a meet or strongman event.</p>
+        <ul class="plan-list">
+          <li>Everything in Full Floor</li>
+          <li>Weekly programming from Marcus</li>
+          <li>Meet-day coaching & handling</li>
+          <li>Priority platform booking</li>
+        </ul>
+        <button class="plan-cta" onclick="openModal('Competitor')">Go Competitor</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="location section-pad" id="location">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">Find Us</span>
+        <h2>On The River</h2>
+      </div>
+      <p>Street parking out front, bike racks by the loading dock entrance.</p>
+    </div>
+    <div class="location-grid">
+      <div class="location-info">
+        <p>Foundry 84 sits inside a working ironworks building — look for the loading-dock doors, not a storefront.</p>
+        <div class="location-detail">
+          <div class="dot"></div>
+          <div><b>Address</b><span>123 Riverside Ave, Unit 12, Your City, ST 00000</span></div>
+        </div>
+        <div class="location-detail">
+          <div class="dot"></div>
+          <div><b>Hours</b><span>Monday – Sunday, 05:30 – 22:00</span></div>
+        </div>
+        <div class="location-detail">
+          <div class="dot"></div>
+          <div><b>Parking</b><span>Free street parking on Riverside Ave</span></div>
+        </div>
+        <a href="https://maps.app.goo.gl/MufLBEDUDrX2afxB7" target="_blank" rel="noopener noreferrer" class="btn-ghost" style="align-self:flex-start; margin-top:8px;">Get Directions ↗</a>
+      </div>
+      <div class="map-frame" style="position:relative;">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3681.7708096060555!2d88.38658769678952!3d22.662332300000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f89db78daf67bd%3A0x1664c399fa86cfbc!2sFITNESS%20BOOSTER%20STUDIO%202!5e0!3m2!1sen!2sin!4v1783658192788!5m2!1sen!2sin"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Foundry 84 location on Google Maps">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="wrap">
+    <span class="section-tag" style="justify-content:center; display:flex;">Ready When You Are</span>
+    <h2>The Forge Is Lit<br>Five Days A Week.</h2>
+    <p>Come try a session before you commit to anything. Bring shoes you can plant, we'll handle the rest.</p>
+    <button class="btn-primary" onclick="openModal('Free Trial Session')">Book Your Free Session</button>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="margin-bottom:16px;">FOUNDRY<span>84</span></div>
+        <p style="max-width:280px;">Unit 12, Riverside Ironworks. A strength gym built inside a working foundry since 1984.</p>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <p>Unit 12, Riverside Ironworks</p>
+        <p>Kolkata, WB</p>
+        <p>Open 05:30 – 22:00 Daily</p>
+      </div>
+      <div>
+        <h4>Programs</h4>
+        <a href="#programs">Foundation</a>
+        <a href="#programs">Powerlifting</a>
+        <a href="#programs">Metal Conditioning</a>
+        <a href="#programs">Open Floor</a>
+      </div>
+      <div>
+        <h4>Gym</h4>
+        <a href="#trainers">Coaches</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#membership">Membership</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Foundry 84. All bars accounted for.</span>
+      <span class="mono">FORGED IN THE IRONWORKS</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="bookingModal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
+
+    <div id="modalForm">
+      <span class="section-tag">Book Now</span>
+      <h3 id="modalTitle">Reserve Your Spot</h3>
+      <p class="modal-sub" id="modalSub">Tell us where to reach you and we'll confirm your session.</p>
+      <form id="bookForm">
+        <div class="field">
+          <label for="fname">Full Name</label>
+          <input type="text" id="fname" required placeholder="Jordan Lee">
+        </div>
+        <div class="field">
+          <label for="femail">Email</label>
+          <input type="email" id="femail" required placeholder="jordan@email.com">
+        </div>
+        <div class="field">
+          <label for="fphone">Phone</label>
+          <input type="tel" id="fphone" required placeholder="+1 (555) 000-0000">
+        </div>
+        <div class="field">
+          <label for="fplan">Interested In</label>
+          <select id="fplan">
+            <option>Free Trial Session</option>
+            <option>Foundation</option>
+            <option>Full Floor</option>
+            <option>Competitor</option>
+          </select>
+        </div>
+        <button type="submit" class="modal-submit">Confirm Request</button>
+      </form>
+    </div>
+
+    <div class="modal-success" id="modalSuccess">
+      <div class="check">✓</div>
+      <h3>Request Sent</h3>
+      <p>We've got your details — someone from Foundry 84 will call or email you within one business day to lock in your slot.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- Booking modal ----
+  const modal = document.getElementById('bookingModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalSub = document.getElementById('modalSub');
+  const modalForm = document.getElementById('modalForm');
+  const modalSuccess = document.getElementById('modalSuccess');
+  const bookForm = document.getElementById('bookForm');
+  const fplan = document.getElementById('fplan');
+
+  function openModal(planName){
+    modalForm.style.display = 'block';
+    modalSuccess.classList.remove('show');
+    if(planName){
+      fplan.value = planName;
+      modalTitle.textContent = planName === 'Free Trial Session' ? 'Book A Free Session' : 'Join — ' + planName;
+      modalSub.textContent = planName === 'Free Trial Session'
+        ? "Tell us where to reach you and we'll set up your first session."
+        : "Tell us where to reach you and we'll get your " + planName + " membership started.";
+    }
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  }
+
+  // click outside box closes modal
+  modal.addEventListener('click', (e) => {
+    if(e.target === modal) closeModal();
+  });
+  // escape key closes modal
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+
+  bookForm.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    // TODO: Replace YOUR_FORM_ID below with the ID Formspree gives you
+    // (Step-by-step instructions are in the message from Claude / README).
+    const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mwvdgvgp';
+
+    const submitBtn = bookForm.querySelector('.modal-submit');
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        name: fname.value,
+        email: femail.value,
+        phone: fphone.value,
+        interested_in: fplan.value
+      })
+    })
+    .then(res => {
+      if(res.ok){
+        modalForm.style.display = 'none';
+        modalSuccess.classList.add('show');
+        bookForm.reset();
+      } else {
+        alert('Something went wrong sending your request. Please try again or call us directly.');
+      }
+    })
+    .catch(() => {
+      alert('Could not send your request — check your connection and try again.');
+    })
+    .finally(() => {
+      submitBtn.textContent = 'Confirm Request';
+      submitBtn.disabled = false;
+    });
+  });
+
+  // Animate heat gauges when scrolled into view
+  const gauges = document.querySelectorAll('.gauge-fill');
+  const setWidths = new Map();
+  gauges.forEach(g => { setWidths.set(g, g.style.width); g.style.width = '0%'; });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.style.width = setWidths.get(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+
+  gauges.forEach(g => observer.observe(g));
+
+  /*
+    This form is wired to Formspree (endpoint above) and will send real
+    submissions to your inbox. Remember: Formspree requires you to confirm
+    the very first submission via a link in your email before it starts
+    delivering the rest.
+  */
+</script>
+
+</body>
+</html>
